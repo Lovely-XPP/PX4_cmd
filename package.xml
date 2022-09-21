@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>px4_cmd</name>
+    <version>0.0.1</version>
+    <description>px4</description>
+
+    <maintainer email="yipeng3@mail2.sysu.edu.cn">Peng Yi</maintainer>
+    <license>TODO</license>
+
+    <build_depend>message_generation</build_depend>
+    <exec_depend>message_runtime</exec_depend>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>roscpp</build_depend>
+    <build_depend>std_msgs</build_depend>
+    
+    <exec_depend>std_msgs</exec_depend>
+</package>
