@@ -7,7 +7,7 @@ PX4 command sent via terminal (based on mavlink), for whom wants to control vehi
 - [x] Mode Change
 - [ ] Send Desire Position/Attitude/Accelerate for Offboard
 
-## MoreInfo for Offboard Mode
+## About Offboard Mode
 If you have problem for changing mode to Offboard Mode, please check the offical instruction:
 
 > Note for Offboard Mode
