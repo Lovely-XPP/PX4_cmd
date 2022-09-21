@@ -59,7 +59,8 @@ int main(int argc, char **argv)
         "STABILIZED",   //自稳
         "POSCTL",       //位置控制
         "ALTCTL",       //高度控制
-        "Arm"           //解除锁定
+        "Arm",          //解除锁定
+        "DisArm"        //锁定
     };
 
     while (ros::ok())
@@ -104,42 +105,45 @@ int main(int argc, char **argv)
             continue;
         }
 
-        // 解锁单独
-        if (switch_mode == (mode_list.size() - 1))
+        // 获取理想模式
+        desire_mode = mode_list[switch_mode];
+
+        // 解锁
+        if (switch_mode >= (mode_list.size() - 2))
         {
-            while(!current_state.armed && error_times < 10)
+            bool desire_arm_cmd = (desire_mode == "Arm") ? true : false;
+            while ((current_state.armed != desire_arm_cmd) && error_times < 10)
             {
-                arm_cmd.request.value = true;
-                Info("Arming...");
+                arm_cmd.request.value = desire_arm_cmd;
+                Info(desire_mode + "ing...");
                 if (arming_client.call(arm_cmd) && arm_cmd.response.success)
                 {
                     //执行回调函数
                     ros::spinOnce();
                     sleep(1);
-                    if (current_state.armed)
+                    if (current_state.armed == desire_arm_cmd)
                     {
-                        Info("Arm Command Sent and Arm Successfully!");
+                        Info(desire_mode + " Command Sent and " + desire_mode + " Successfully!");
                     }
                     else
                     {
-                        Warning("Arm Command Sent but Arm Failed!");
+                        Warning(desire_mode + " Command Sent but " + desire_mode + " Failed!");
                     }
                 }
                 else
                 {
-                    Error("Arm Command Sent Failed!");
+                    Error(desire_mode + " Command Sent Failed!");
                 }
                 error_times++;
             }
             if (error_times == 0)
             {
-                Info("Already Arm!");
+                Info("Already " + desire_mode + "!");
             }
         }
         // 更改模式
         else
         {
-            desire_mode = mode_list[switch_mode];
             while (current_state.mode != desire_mode && error_times < 10)
             {
                 // 请求更改模式服务

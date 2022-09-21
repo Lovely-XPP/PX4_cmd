@@ -60,4 +60,5 @@ void Info(string msg)
 {
     cout << GREEN << "[INFO] " + msg << WHITE << endl;
 }
+
 #endif
