@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("/mavros/cmd/arming");
 
     //设置频率
-    ros::Rate rate(50);
+    ros::Rate rate(50.0);
 
     // 设定指令初始化
     mavros_msgs::SetMode mode_cmd;
@@ -58,6 +58,14 @@ int main(int argc, char **argv)
         "Arm",          //解除锁定
         "DisArm"        //锁定
     };
+
+    // 等待节点初始化完成
+    sleep(2);
+    for (int i = 0; i < 50; i++)
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     // 主循环
     while (ros::ok())

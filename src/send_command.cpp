@@ -40,6 +40,10 @@ int main(int argc, char **argv)
     sleep(1);
     ros::Rate rate(50.0);
 
+    // 输出标题（提示）
+    print_head("PX4 Command Sender");
+    Info("PX4 Command Sender is Running...");
+
     // 主循环
     while (ros::ok())
     {
