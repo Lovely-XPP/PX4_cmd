@@ -53,6 +53,8 @@ int main(int argc, char **argv)
         "STABILIZED",   //自稳
         "POSCTL",       //位置控制
         "ALTCTL",       //高度控制
+        "AUTO.LAND",    //自动降落
+        "AUTO.RTL",     //自动返航
         "Arm",          //解除锁定
         "DisArm"        //锁定
     };

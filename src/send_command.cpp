@@ -4,6 +4,7 @@
 #include <string>
 
 #include <mavros_msgs/PositionTarget.h>
+#include <mavros_msgs/SetMode.h>
 #include <px4_cmd/Command.h>
 
 #include <utility/printf_utility.h>
@@ -13,6 +14,7 @@ using namespace std;
 // 初始化信息用于接受设置命令,发送指定位置信息
 px4_cmd::Command set_cmd;
 mavros_msgs::PositionTarget pos_setpoint;
+mavros_msgs::SetMode mode_cmd;
 
 // 初始化订阅和广播
 ros::Subscriber set_cmd_sub;
@@ -27,8 +29,12 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "send_command");
     ros::NodeHandle nh;
 
+    // 广播和节点
     set_cmd_sub = nh.subscribe<px4_cmd::Command>("/px4_cmd/control_command", 10, sub_set_cmd_cb);
     setpoint_raw_local_pub = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 10);
+
+    // 服务
+    ros::ServiceClient mode_client = nh.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
 
     // 等待节点初始化完成
     sleep(1);
