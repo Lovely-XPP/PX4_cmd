@@ -12,13 +12,7 @@
 using namespace std;
 
 mavros_msgs::State current_state;
-
-
-// 订阅回调返回状态信息
-void state_cb(const mavros_msgs::State::ConstPtr &msg)
-{
-    current_state = *msg;
-}
+void state_cb(const mavros_msgs::State::ConstPtr &msg);
 
 /* 主函数 */
 int main(int argc, char **argv)
@@ -193,3 +187,8 @@ int main(int argc, char **argv)
 }
 
 
+// 订阅回调返回状态信息
+void state_cb(const mavros_msgs::State::ConstPtr &msg)
+{
+    current_state = *msg;
+}

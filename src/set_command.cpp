@@ -4,9 +4,6 @@
 #include <iostream>
 #include <string>
 
-#include <mavros_msgs/CommandBool.h>
-#include <mavros_msgs/SetMode.h>
-#include <mavros_msgs/State.h>
 #include <px4_cmd/Command.h>
 
 #include <utility/printf_utility.h>
@@ -239,7 +236,7 @@ void print_current_cmd(px4_cmd::Command cmd)
 // 广播线程
 void pub_thread_fun()
 {
-    ros::Rate rate(20.0);
+    ros::Rate rate(50.0);
     while (ros::ok())
     {
         cmd_pub.publish(cmd);
