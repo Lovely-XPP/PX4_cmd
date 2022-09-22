@@ -8,6 +8,34 @@ PX4 command sent via terminal (based on mavlink), for whom wants to control vehi
 - [x] Set Command 
 - [x] Send Command to PX4
 
+## Required Packages
+```
+PX4-Autopilot
+Mavros
+```
+
+## Installation
+```bash
+# Create Catkin Workspace in home
+mkdir -p ~/px4_ws/src 
+cd catkin_ws/src
+catkin_init_workspace
+# Clone this Repo
+git clone https://github.com/Lovely-XPP/PX4_cmd.git
+# make
+cd ..
+catkin_make
+# Add Source for the project
+"source ~/px4_ws/devel/setup.bash" >> ~/.bashrc
+# update terminal
+source ~/.bashrc
+```
+
+## Run Simulation
+```bash
+bash ~/px4_ws/src/px4_cmd/src/sh/sitl_gazebo_iris.sh
+```
+
 ## About Offboard Mode
 If you have problem for changing mode to Offboard Mode, please check the offical instruction:
 
@@ -20,3 +48,7 @@ If you have problem for changing mode to Offboard Mode, please check the offical
 > - Not all coordinate frames and field values allowed by MAVLink are supported.
 
 More details in [https://docs.px4.io/main/en/flight_modes/offboard.html](https://docs.px4.io/main/en/flight_modes/offboard.html).
+
+## Credits
+- PX4_command
+- [PX4_Guide](https://docs.px4.io/main)
