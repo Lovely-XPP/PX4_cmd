@@ -21,3 +21,7 @@ uint8 Move_mode
 uint8 XYZ_POS = 0       ### 定点控制
 uint8 XY_VEL_Z_POS = 1  ### 定高速度控制
 uint8 XYZ_VEL = 2       ### 速度控制
+
+## 指令输入
+float32[3] desire_cmd          ## [m] [m/s] [m/s^2]
+float32 yaw_cmd                ## [rad]

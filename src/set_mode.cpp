@@ -63,11 +63,12 @@ int main(int argc, char **argv)
         "DisArm"        //锁定
     };
 
+    // 主循环
     while (ros::ok())
     {
         // 清屏及初始化
         system("clear");
-        cout << POINTER << endl;
+        cout << POINTER;
         error_times = 0;
 
         // 输出标题及选项
@@ -91,7 +92,8 @@ int main(int argc, char **argv)
         // 判断输入正确性
         if (switch_mode >= mode_list.size() || switch_mode < 0)
         {
-            cout << RED << "\n[ERROR] Please Input int 0 ~ " + to_string(mode_list.size() - 1) << WHITE << endl;
+            cout << "\n" << endl;
+            Error("Please Input int 0 ~ " + to_string(mode_list.size() - 1));
             sleep(2);
             continue;
         }

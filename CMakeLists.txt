@@ -22,11 +22,10 @@ catkin_package(
     CATKIN_DEPENDS message_runtime std_msgs
 )
 
-
 # include dir
 include_directories(
-include
-${catkin_INCLUDE_DIRS}
+    include
+    ${catkin_INCLUDE_DIRS}
 )
 
 # ##################  Exec  ###################

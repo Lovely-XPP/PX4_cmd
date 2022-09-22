@@ -5,7 +5,8 @@ PX4 command sent via terminal (based on mavlink), for whom wants to control vehi
 
 ## Todo
 - [x] Mode Change
-- [ ] Send Desire Position/Attitude/Accelerate to PX4 via Offboard Mode
+- [x] Set Command 
+- [ ] Send Command to PX4
 
 ## About Offboard Mode
 If you have problem for changing mode to Offboard Mode, please check the offical instruction:
