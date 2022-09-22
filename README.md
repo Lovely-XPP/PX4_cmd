@@ -33,7 +33,7 @@ source ~/.bashrc
 
 ## Run Simulation
 ```bash
-bash ~/px4_ws/src/px4_cmd/src/sh/sitl_gazebo_iris.sh
+bash ~/px4_ws/src/px4_cmd/src/sh/sim.sh
 ```
 
 ## About Offboard Mode
