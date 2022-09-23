@@ -155,19 +155,21 @@ int main(int argc, char **argv)
                 // 机体坐标系仅支持速度控制
                 if (switch_frame == px4_cmd::Command::BODY)
                 {
-                    cout << "Tip: Body Frame only support velocity control!" << endl;
+                    system("clear");
+                    print_head("PX4 Command Center");
+                    cout << YELLOW << "Tip: Body Frame Only Support [" << GREEN << "Velocity (XYZ)" << YELLOW << "] Control!" << WHITE << endl;
                     cout << "\n" << "X Velocity [m/s]: ";
                     cin >> desire_cmd_value[0];
                     cout << "\n" << "Y Velocity [m/s]: ";
                     cin >> desire_cmd_value[1];
-                    cout << "\n" << "Z Velocity [m/s]:: ";
+                    cout << "\n" << "Z Velocity [m/s]: ";
                     cin >> desire_cmd_value[2];
                     // yaw指令输入
                     cout << "\n" << "Yaw Command [rad]: ";
                     cin >> yaw_value;
                     // 修改命令
                     cmd.Move_frame = switch_frame;
-                    cmd.Move_mode = switch_cmd_mode;
+                    cmd.Move_mode = px4_cmd::Command::XYZ_VEL;
                     cmd.desire_cmd[0] = desire_cmd_value[0];
                     cmd.desire_cmd[1] = desire_cmd_value[1];
                     cmd.desire_cmd[2] = desire_cmd_value[2];
