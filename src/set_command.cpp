@@ -118,9 +118,9 @@ int main(int argc, char **argv)
             {
                 cmd.Move_frame = px4_cmd::Command::ENU;
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
-                cmd.desire_cmd[0] = 0.0;
-                cmd.desire_cmd[1] = 0.0;
-                cmd.desire_cmd[2] = 0.0;
+                cmd.desire_cmd[0] = current_state.pose.position.x;
+                cmd.desire_cmd[1] = current_state.pose.position.y;
+                cmd.desire_cmd[2] = current_state.pose.position.z;
                 cmd.yaw_cmd = 0.0;
                 break;
             }
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
                 cmd.desire_cmd[0] = current_state.pose.position.x;
                 cmd.desire_cmd[1] = current_state.pose.position.y;
-                cmd.desire_cmd[2] = 2.0;
+                cmd.desire_cmd[2] = 7.0;
                 cmd.yaw_cmd = 0.0;
                 break;
             }

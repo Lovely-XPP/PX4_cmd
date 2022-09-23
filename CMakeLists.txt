@@ -5,6 +5,9 @@ endif(POLICY CMP0048)
 # project name version languages
 project(px4_cmd VERSION 1.0.1 LANGUAGES CXX)
 
+# set C++ standard
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 # find package
 find_package(catkin REQUIRED COMPONENTS
     roscpp
