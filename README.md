@@ -26,7 +26,7 @@ git clone https://github.com/Lovely-XPP/PX4_cmd.git
 cd ..
 catkin_make
 # Add Source for the project
-"source ~/px4_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/px4_ws/devel/setup.bash" >> ~/.bashrc
 # update terminal
 source ~/.bashrc
 ```
