@@ -6,10 +6,15 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <utility/printf_utility.h>
 
 using namespace std;
+
+// 订阅信息
+geometry_msgs::PoseStamped current_pos;
+void pos_cb(const geometry_msgs::PoseStamped::ConstPtr &msg);
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr &msg);
@@ -23,10 +28,10 @@ int main(int argc, char **argv)
 
     // 订阅
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("/mavros/state", 10, state_cb);
+    ros::Subscriber pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 10, pos_cb);
 
     // 服务
     ros::ServiceClient mode_client = nh.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
-
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("/mavros/cmd/arming");
 
     //设置频率
@@ -88,8 +93,14 @@ int main(int argc, char **argv)
         {
             cout << YELLOW << "DisArm" << WHITE << "]" << endl;
         }
+        // 输出当前位置
+        cout << "Current Position [ENU]:" << endl;
+        cout << setprecision(2) << "   x: " << fixed << current_pos.pose.position.x << " m" << endl;
+        cout << setprecision(2) << "   y: " << fixed << current_pos.pose.position.y << " m" << endl;
+        cout << setprecision(2) << "   z: " << fixed << current_pos.pose.position.z << " m" << endl;
+
         // 获取输入
-        cout << WHITE << "Input Mode Number : ";
+        cout << WHITE << "\n" << "Input Mode Number: ";
         cin >> switch_mode;
         cout << NO_POINTER;
 
@@ -117,6 +128,15 @@ int main(int argc, char **argv)
         // 解锁
         if (switch_mode >= (mode_list.size() - 2))
         {
+            // 如果飞行高度超过20cm则不允许DisArm
+            if (abs(current_pos.pose.position.z) > 0.2 && desire_mode == "DisArm")
+            {
+                cout << "\n";
+                Error("Vehicle is Flying, you can not DisArm!");
+                sleep(2);
+                continue;
+            }
+            
             bool desire_arm_cmd = (desire_mode == "Arm") ? true : false;
             while ((current_state.armed != desire_arm_cmd) && error_times < 10)
             {
@@ -157,7 +177,9 @@ int main(int argc, char **argv)
                 {
                     if (desire_mode != "AUTO.LAND" && desire_mode != "AUTO.RTL")
                     {
+                        cout << "\n";
                         Error("You are in OFFBOARD Mode, you can only change to [Auto.Land] or [Auto.RTL] Mode!");
+                        error_times++;
                         break;
                     }
                 }
@@ -210,4 +232,9 @@ int main(int argc, char **argv)
 void state_cb(const mavros_msgs::State::ConstPtr &msg)
 {
     current_state = *msg;
+}
+// 订阅回调返回位置信息
+void pos_cb(const geometry_msgs::PoseStamped::ConstPtr &msg)
+{
+    current_pos = *msg;
 }

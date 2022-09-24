@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     // 订阅
-    state_sub = nh.subscribe<geometry_msgs::PoseStamped>("mavros/local_position/pose", 10, state_cb);
+    state_sub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 10, state_cb);
 
     // 广播初始化
     cmd_pub = nh.advertise<px4_cmd::Command>("/px4_cmd/control_command", 10);
@@ -251,9 +251,9 @@ void print_current_cmd(px4_cmd::Command cmd)
     cout << WHITE << "Current Command: [" << GREEN << command_list[cmd.Mode] << WHITE << "]    ";
     cout << WHITE << "Frame: [" << GREEN << frame_list[cmd.Move_frame] << WHITE << "]" << endl;
     cout << WHITE << "Mode: [" << GREEN << move_list[cmd.Move_mode] << WHITE << "]" << endl;
-    cout << WHITE << "Value: " << setprecision(2) << cmd.desire_cmd[0]
+    cout << WHITE << "Value: " << fixed << setprecision(2) << cmd.desire_cmd[0]
          << "  " << cmd.desire_cmd[1] << "  " << cmd.desire_cmd[2] << "    ";
-    cout << WHITE << "Yaw: " << setprecision(2) << cmd.yaw_cmd << endl;
+    cout << WHITE << "Yaw: " << fixed << setprecision(2) << cmd.yaw_cmd << endl;
 }
 
 // 广播线程
