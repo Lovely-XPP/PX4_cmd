@@ -102,12 +102,12 @@ int main(int argc, char **argv)
             continue;
         }
 
-        // 刷新状态
+        // 回调函数,更新状态
+        ros::spinOnce();
+        rate.sleep();
+
         if (switch_mode == 0)
         {
-            //执行回调函数,更新状态
-            ros::spinOnce();
-            rate.sleep();
             continue;
         }
 
@@ -152,6 +152,15 @@ int main(int argc, char **argv)
         {
             while (current_state.mode != desire_mode && error_times < 10)
             {
+                // 处于OFFBOARD模式时，只能改为AUTO模式
+                if (current_state.mode == "OFFBOARD")
+                {
+                    if (desire_mode != "AUTO.LAND" && desire_mode != "AUTO.RTL")
+                    {
+                        Error("You are in OFFBOARD Mode, you can only change to [Auto.Land] or [Auto.RTL] Mode!");
+                        break;
+                    }
+                }
                 // 请求更改模式服务
                 mode_cmd.request.custom_mode = desire_mode;
                 mode_client.call(mode_cmd);

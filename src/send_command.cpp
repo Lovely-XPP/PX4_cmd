@@ -109,9 +109,10 @@ void sub_set_cmd_cb(const px4_cmd::Command::ConstPtr &msg)
             pos_setpoint.velocity.z = set_cmd.desire_cmd[2];
             break;
         }
-        
-        pos_setpoint.header.frame_id = 1;
-
-        pos_setpoint.yaw = set_cmd.yaw_cmd;
     }
+    
+    pos_setpoint.header.frame_id = 1;
+
+    pos_setpoint.yaw = set_cmd.yaw_cmd;
+        
 }
