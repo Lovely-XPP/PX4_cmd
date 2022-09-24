@@ -49,6 +49,28 @@ If you have problem for changing mode to Offboard Mode, please check the offical
 
 More details in [https://docs.px4.io/main/en/flight_modes/offboard.html](https://docs.px4.io/main/en/flight_modes/offboard.html).
 
+## About PX4 V1.13.0 or Newer Version
+
+***Tips: If you are using PX4 V1.13.0 or newer, you can not set to Offboard Mode in simulation, because Offboard Mode can not be enabled without RC signal in newer version.***
+
+### Relevant Code
+`PX4-Autopilot/src/modules/commander/state_machine_helper.cpp: 632`
+
+```cpp
+else if (status.rc_signal_lost && !(param_com_rcl_except & RCLossExceptionBits::RCL_EXCEPT_OFFBOARD)) {
+    // Only RC is lost
+    enable_failsafe(status, old_failsafe, mavlink_log_pub, event_failsafe_reason_t::no_rc);
+    set_link_loss_nav_state(status, armed, status_flags, internal_state, rc_loss_act, param_com_rcl_act_t);
+}
+```
+
+Therefore, even if we provide stable Offboard Desire Command (publish to `/mavros/setpoints_raw/local`, > 2 Hz), we still can not enable the Offboard Mode if We do not have RC signal.
+
+### Temporary Solution
+If you don't want to connet a RC controller for simulation, you can delete the code shown above, but ***it only for simulation use, DO NOT DELETE For Real Vehicle USE.***
+
+
+
 ## Credits
 - PX4_command
 - [PX4_Guide](https://docs.px4.io/main)
