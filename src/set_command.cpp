@@ -121,9 +121,12 @@ int main(int argc, char **argv)
             {
                 cmd.Move_frame = px4_cmd::Command::ENU;
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
-                cmd.desire_cmd[0] = current_state.pose.position.x;
-                cmd.desire_cmd[1] = current_state.pose.position.y;
-                cmd.desire_cmd[2] = current_state.pose.position.z;
+                desire_cmd_value[0] = current_state.pose.position.x;
+                desire_cmd_value[1] = current_state.pose.position.y;
+                desire_cmd_value[2] = current_state.pose.position.z;
+                cmd.desire_cmd[0] = desire_cmd_value[0];
+                cmd.desire_cmd[1] = desire_cmd_value[1];
+                cmd.desire_cmd[2] = desire_cmd_value[2];
                 cmd.yaw_cmd = 0.0;
                 break;
             }
@@ -132,12 +135,15 @@ int main(int argc, char **argv)
             {
                 // 用户指定起飞高度
                 cout << "\n" << "Set Takeoff Height [m]: ";
-                cin >> cmd.desire_cmd[2];
-                cmd.desire_cmd[2] = abs(cmd.desire_cmd[2]);
+                cin >> desire_cmd_value[2];
+                desire_cmd_value[2] = abs(desire_cmd_value[2]);
                 cmd.Move_frame = px4_cmd::Command::ENU;
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
-                cmd.desire_cmd[0] = current_state.pose.position.x;
-                cmd.desire_cmd[1] = current_state.pose.position.y;
+                desire_cmd_value[0] = current_state.pose.position.x;
+                desire_cmd_value[1] = current_state.pose.position.y;
+                cmd.desire_cmd[0] = desire_cmd_value[0];
+                cmd.desire_cmd[1] = desire_cmd_value[1];
+                cmd.desire_cmd[2] = desire_cmd_value[2];
                 cmd.yaw_cmd = 0.0;
                 break;
             }
