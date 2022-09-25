@@ -3,7 +3,42 @@
 ## Introduction
 PX4 command sent via terminal (based on mavlink), for whom wants to control vehicle by themselves, e.g. setting points.
 
+## Support Command
+
+### Idle
+
+Initial Mode for Vehicle.
+
+### Takeoff
+
+You can set desire height for takeoff.
+
+### Move
+
+| Frame | SubCommand |
+| :---: | ----------- |
+|   ENU    | Position (XYZ) [m]<br>Velocity (XY) [m/s] + Height (Z) [m]<br>Velocity (XYZ) [m/s]<br>Relative Position (XYZ) [m] |
+|   Body   | Velocity (XYZ) [m/s] |
+
+And support `yaw command [deg]` input for both frames.
+
+
+## Support Mode
+```c++
+"Refresh Status"  //刷新状态
+​"MANUAL"          //手动
+​"OFFBOARD"        //外部控制
+​"STABILIZED"      //自稳
+​"POSCTL"          //位置控制
+​"ALTCTL"          //高度控制
+​"AUTO.LAND"       //自动降落
+​"AUTO.RTL"        //自动返航
+​"Arm"             //解除锁定
+​"DisArm"          //锁定
+```
+
 ## Todo
+
 - [x] Mode Change
 - [x] Set Command 
 - [x] Send Command to PX4

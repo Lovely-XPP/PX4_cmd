@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
     // 定义列表储存所有模式
     std::vector<string> mode_list = {
-        "Refresh status",//刷新状态
+        "Refresh Status",//刷新状态
         "MANUAL",       //手动
         "OFFBOARD",     //外部控制
         "STABILIZED",   //自稳

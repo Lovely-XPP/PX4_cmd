@@ -40,7 +40,7 @@ std::vector<string> frame_list = {
 // 指令方式
 std::vector<string> move_list = {
     "Position (XYZ)",            //三位置
-    "Velocity (XY) + Alltitude", //定高两速度
+    "Velocity (XY) + Height (Z)", //定高两速度
     "Velocity (XYZ)",            //定高两速度
     "Relative Position (XYZ)"    //三相对位置
 };
@@ -128,11 +128,14 @@ int main(int argc, char **argv)
 
             case px4_cmd::Command::Takeoff:
             {
+                // 用户指定起飞高度
+                cout << "\n" << "Set Takeoff Height [m]: ";
+                cin >> cmd.desire_cmd[2];
+                cmd.desire_cmd[2] = abs(cmd.desire_cmd[2]);
                 cmd.Move_frame = px4_cmd::Command::ENU;
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
                 cmd.desire_cmd[0] = current_state.pose.position.x;
                 cmd.desire_cmd[1] = current_state.pose.position.y;
-                cmd.desire_cmd[2] = 7.0;
                 cmd.yaw_cmd = 0.0;
                 break;
             }
