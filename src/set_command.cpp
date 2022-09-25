@@ -46,7 +46,7 @@ std::vector<string> move_list = {
 };
 
 // 子函数声明
-void print_current_cmd(px4_cmd::Command cmd);
+void print_current_cmd(px4_cmd::Command cmd, float cmd_value[3]);
 void pub_thread_fun();
 
 /*     主函数      */
@@ -269,13 +269,13 @@ int main(int argc, char **argv)
 }
 
 // 打印当前命令
-void print_current_cmd(px4_cmd::Command cmd)
+void print_current_cmd(px4_cmd::Command cmd, float cmd_value[3])
 {
     cout << WHITE << "Current Command: [" << GREEN << command_list[cmd.Mode] << WHITE << "]    ";
     cout << WHITE << "Frame: [" << GREEN << frame_list[cmd.Move_frame] << WHITE << "]" << endl;
     cout << WHITE << "Mode: [" << GREEN << move_list[cmd.Move_mode] << WHITE << "]" << endl;
-    cout << WHITE << "Value: " << fixed << setprecision(2) << cmd.desire_cmd[0]
-         << "  " << cmd.desire_cmd[1] << "  " << cmd.desire_cmd[2] << "    ";
+    cout << WHITE << "Value: " << fixed << setprecision(2) << cmd_value[0]
+         << "  " << cmd_value[1] << "  " << cmd_value[2] << "    ";
     cout << WHITE << "Yaw: " << fixed << setprecision(2) << cmd.yaw_cmd << endl;
 }
 
