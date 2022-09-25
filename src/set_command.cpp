@@ -12,6 +12,8 @@
 
 using namespace std;
 
+// 定义pi值
+#define PI 3.14159265358979323846
 
 // 发布消息初始化
 ros::Publisher cmd_pub;
@@ -243,7 +245,7 @@ int main(int argc, char **argv)
                     }
                 }
                 // yaw指令输入
-                cout << "\n" << "Yaw Command [rad]: ";
+                cout << "\n" << "Yaw Command [deg]: ";
                 cin >> yaw_value;
 
                 // 修改命令
@@ -263,7 +265,7 @@ int main(int argc, char **argv)
                     cmd.desire_cmd[2] = desire_cmd_value[2];
                 }
                 
-                cmd.yaw_cmd = yaw_value;
+                cmd.yaw_cmd = yaw_value/180.0*PI;
                 break;
             }
         }
