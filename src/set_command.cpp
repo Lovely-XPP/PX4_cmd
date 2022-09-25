@@ -249,13 +249,17 @@ int main(int argc, char **argv)
                 // 相对位置指令需要加上当前的位置得到绝对位置
                 if (switch_cmd_mode == px4_cmd::Command::XYZ_REL_POS)
                 {
-                    desire_cmd_value[0] = desire_cmd_value[0] + current_state.pose.position.x;
-                    desire_cmd_value[1] = desire_cmd_value[1] + current_state.pose.position.y;
-                    desire_cmd_value[2] = desire_cmd_value[2] + current_state.pose.position.z;
+                    cmd.desire_cmd[0] = desire_cmd_value[0] + current_state.pose.position.x;
+                    cmd.desire_cmd[1] = desire_cmd_value[1] + current_state.pose.position.y;
+                    cmd.desire_cmd[2] = desire_cmd_value[2] + current_state.pose.position.z;
                 }
-                cmd.desire_cmd[0] = desire_cmd_value[0];
-                cmd.desire_cmd[1] = desire_cmd_value[1];
-                cmd.desire_cmd[2] = desire_cmd_value[2];
+                else
+                {
+                    cmd.desire_cmd[0] = desire_cmd_value[0];
+                    cmd.desire_cmd[1] = desire_cmd_value[1];
+                    cmd.desire_cmd[2] = desire_cmd_value[2];
+                }
+                
                 cmd.yaw_cmd = yaw_value;
                 break;
             }
