@@ -41,7 +41,8 @@ std::vector<string> frame_list = {
 std::vector<string> move_list = {
     "Position (XYZ)",            //三位置
     "Velocity (XY) + Alltitude", //定高两速度
-    "Velocity (XYZ)"             //定高两速度
+    "Velocity (XYZ)",            //定高两速度
+    "Relative Position (XYZ)"    //三相对位置
 };
 
 // 子函数声明
@@ -226,6 +227,17 @@ int main(int argc, char **argv)
                         cin >> desire_cmd_value[2];
                         break;
                     }
+
+                    case px4_cmd::Command::XYZ_REL_POS:
+                    {
+                        cout << "\n" << "X Relative Position [m]: ";
+                        cin >> desire_cmd_value[0];
+                        cout << "\n" << "Y Relative Position [m]: ";
+                        cin >> desire_cmd_value[1];
+                        cout << "\n" << "Z Relative Position [m]: ";
+                        cin >> desire_cmd_value[2];
+                        break;
+                    }
                 }
                 // yaw指令输入
                 cout << "\n" << "Yaw Command [rad]: ";
@@ -234,6 +246,13 @@ int main(int argc, char **argv)
                 // 修改命令
                 cmd.Move_frame = switch_frame;
                 cmd.Move_mode = switch_cmd_mode;
+                // 相对位置指令需要加上当前的位置得到绝对位置
+                if (switch_cmd_mode == px4_cmd::Command::XYZ_REL_POS)
+                {
+                    desire_cmd_value[0] = desire_cmd_value[0] + current_state.pose.position.x;
+                    desire_cmd_value[1] = desire_cmd_value[1] + current_state.pose.position.y;
+                    desire_cmd_value[2] = desire_cmd_value[2] + current_state.pose.position.z;
+                }
                 cmd.desire_cmd[0] = desire_cmd_value[0];
                 cmd.desire_cmd[1] = desire_cmd_value[1];
                 cmd.desire_cmd[2] = desire_cmd_value[2];
