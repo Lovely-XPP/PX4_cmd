@@ -7,6 +7,8 @@ uint8 Mode
 uint8 Idle=0
 uint8 Takeoff=1
 uint8 Move=2
+uint8 Hover=3
+uint8 Trajectory=4
 
 ## 移动命令坐标系
 uint8 Move_frame

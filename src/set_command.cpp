@@ -28,9 +28,11 @@ px4_cmd::Command cmd;
 
 // 定义列表储存所有模式
 std::vector<string> command_list = {
-    "Idle",    //怠速
-    "Takeoff", //起飞到指定高度
-    "Move",    //移动
+    "Idle",      //怠速
+    "Takeoff",   //起飞到指定高度
+    "Move",      //移动
+    "Hover",     //悬停
+    "Trajectory" //航点轨迹控制
 };
 
 // 坐标系
@@ -45,6 +47,12 @@ std::vector<string> move_list = {
     "Velocity (XY) + Height (Z)", //定高两速度
     "Velocity (XYZ)",            //定高两速度
     "Relative Position (XYZ)"    //三相对位置
+};
+
+// 航点输入方式
+std::vector<string> trajectory_list = {
+    "Position (XYZ)",             //三位置
+    "Relative Position (XYZ)"     //三相对位置
 };
 
 // 子函数声明
@@ -68,6 +76,17 @@ int main(int argc, char **argv)
     int switch_cmd = 0;
     int switch_frame = 0;
     int switch_cmd_mode = 0;
+    int switch_trajectory_mode = 0;
+
+    // 轨迹模式专用
+    //判断是否继续增加航点
+    bool trajectory_next = false;
+    //当前输入的轨迹航点
+    std::vector<float> trajectory_point = {0, 0, 0, 0};
+    //初始化用轨迹航点列表
+    std::vector<vector<float>> init_trajectory_points = {trajectory_point};
+    //轨迹航点列表
+    std::vector<vector<float>> trajectory_points = {trajectory_point};
 
     // 初始化命令信息
     float desire_cmd_value[3];
@@ -273,6 +292,57 @@ int main(int argc, char **argv)
                 
                 cmd.yaw_cmd = yaw_value/180.0*PI;
                 break;
+            }
+
+            case px4_cmd::Command::Hover:
+            {
+                cmd.Move_frame = px4_cmd::Command::ENU;
+                cmd.Move_mode = px4_cmd::Command::XYZ_POS;
+                desire_cmd_value[0] = current_state.pose.position.x;
+                desire_cmd_value[1] = current_state.pose.position.y;
+                desire_cmd_value[2] = current_state.pose.position.z;
+                cmd.desire_cmd[0] = desire_cmd_value[0];
+                cmd.desire_cmd[1] = desire_cmd_value[1];
+                cmd.desire_cmd[2] = desire_cmd_value[2];
+                cmd.yaw_cmd = 0.0;
+                break;
+            }
+
+            case px4_cmd::Command::Trajectory:
+            {
+                // 初始化
+                trajectory_next = true;
+                trajectory_points = init_trajectory_points;
+                // 输入模式：相对位置/绝对位置
+                system("clear");
+                print_title("PX4 Trajectory Center", trajectory_list);
+                cout << WHITE << "Input Trajectory Mode Number: ";
+                cin >> switch_trajectory_mode;
+                // 判断输入正确性
+                if (switch_trajectory_mode >= trajectory_list.size() || switch_trajectory_mode < 0)
+                {
+                    cout << "\n" << NO_POINTER;
+                    Error("Please Input int 0 ~ " + to_string(trajectory_list.size() - 1));
+                    sleep(2);
+                    continue;
+                }
+                // 循环输入航点
+                while (trajectory_next)
+                {
+                    //清空并显示轨迹航点输入模式
+                    system("clear");
+                    print_head("PX4 Trajectory Center");
+                    //打印已输入航点
+                    cout << WHITE << "Current Points: ";
+                    for (int i = 0; i < (trajectory_points.size() - 1); i++)
+                    {
+                        cout << WHITE << "\n\t";
+                        for (int j = 0; j < 4; j++)
+                        {
+                            cout << WHITE << setprecision(2) << fixed << trajectory_points[i][j] << "  ";
+                        }
+                    }
+                }
             }
         }
     }

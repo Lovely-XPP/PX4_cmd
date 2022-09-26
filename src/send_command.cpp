@@ -5,6 +5,7 @@
 
 #include <mavros_msgs/PositionTarget.h>
 #include <mavros_msgs/SetMode.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <px4_cmd/Command.h>
 
 #include <utility/printf_utility.h>
@@ -15,13 +16,16 @@ using namespace std;
 px4_cmd::Command set_cmd;
 mavros_msgs::PositionTarget pos_setpoint;
 mavros_msgs::SetMode mode_cmd;
+geometry_msgs::PoseStamped current_pos;
 
 // 初始化订阅和广播
 ros::Subscriber set_cmd_sub;
+ros::Subscriber current_pos_sub;
 ros::Publisher setpoint_raw_local_pub;
 
 // 声明回调函数
 void sub_set_cmd_cb(const px4_cmd::Command::ConstPtr &msg);
+void pos_cb(const geometry_msgs::PoseStamped::ConstPtr &msg);
 
 int main(int argc, char **argv)
 {
@@ -31,6 +35,7 @@ int main(int argc, char **argv)
 
     // 广播和节点
     set_cmd_sub = nh.subscribe<px4_cmd::Command>("/px4_cmd/control_command", 10, sub_set_cmd_cb);
+    current_pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 10, pos_cb);
     setpoint_raw_local_pub = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 10);
 
     // 服务
@@ -86,9 +91,18 @@ void sub_set_cmd_cb(const px4_cmd::Command::ConstPtr &msg)
         case px4_cmd::Command::XYZ_POS:
         {
             pos_setpoint.type_mask = 0b100111111000;
-            pos_setpoint.position.x = set_cmd.desire_cmd[0];
-            pos_setpoint.position.y = set_cmd.desire_cmd[1];
-            pos_setpoint.position.z = set_cmd.desire_cmd[2];
+            if(set_cmd.Mode == px4_cmd::Command::Hover)
+            {
+                pos_setpoint.position.x = current_pos.pose.position.x;
+                pos_setpoint.position.y = current_pos.pose.position.y;
+                pos_setpoint.position.z = current_pos.pose.position.z;
+            }
+            else
+            {
+                pos_setpoint.position.x = set_cmd.desire_cmd[0];
+                pos_setpoint.position.y = set_cmd.desire_cmd[1];
+                pos_setpoint.position.z = set_cmd.desire_cmd[2];
+            }
             break;
         }
 
@@ -124,4 +138,10 @@ void sub_set_cmd_cb(const px4_cmd::Command::ConstPtr &msg)
 
     pos_setpoint.yaw = set_cmd.yaw_cmd;
         
+}
+
+// 订阅回调返回状态信息
+void pos_cb(const geometry_msgs::PoseStamped::ConstPtr &msg)
+{
+    current_pos = *msg;
 }
