@@ -81,8 +81,13 @@ int main(int argc, char **argv)
     // 轨迹模式专用
     //判断是否继续增加航点
     bool trajectory_next = false;
+    char next_point = '0';
+    char confirm_trajectory = '0';
+    float err_x = 0.0;
+    float err_y = 0.0;
+    float err_z = 0.0;
     //当前输入的轨迹航点
-    std::vector<float> trajectory_point = {0, 0, 0, 0};
+    std::vector<float> trajectory_point = {0, 0, 0, 0, 0};
     //初始化用轨迹航点列表
     std::vector<vector<float>> init_trajectory_points = {trajectory_point};
     //轨迹航点列表
@@ -316,7 +321,8 @@ int main(int argc, char **argv)
                 // 输入模式：相对位置/绝对位置
                 system("clear");
                 print_title("PX4 Trajectory Center", trajectory_list);
-                cout << WHITE << "Input Trajectory Mode Number: ";
+                cout << WHITE << "Tip: Trajectory Only Support Frame [" << GREEN << "ENU" << WHITE << "]" << endl;
+                cout << WHITE << "\n" << "Input Trajectory Mode Number: ";
                 cin >> switch_trajectory_mode;
                 // 判断输入正确性
                 if (switch_trajectory_mode >= trajectory_list.size() || switch_trajectory_mode < 0)
@@ -332,16 +338,130 @@ int main(int argc, char **argv)
                     //清空并显示轨迹航点输入模式
                     system("clear");
                     print_head("PX4 Trajectory Center");
+                    //打印模式
+                    cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
                     //打印已输入航点
-                    cout << WHITE << "Current Points: ";
-                    for (int i = 0; i < (trajectory_points.size() - 1); i++)
+                    cout << WHITE << "Current Points:\t ID\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
+                    for (int i = 1; i < trajectory_points.size(); i++)
                     {
-                        cout << WHITE << "\n\t";
-                        for (int j = 0; j < 4; j++)
+                        cout << WHITE << "\n\t\t " << i;
+                        for (int j = 0; j < trajectory_point.size(); j++)
                         {
-                            cout << WHITE << setprecision(2) << fixed << trajectory_points[i][j] << "  ";
+                            cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
                         }
                     }
+                    cout << "\n\n"
+                         << "######################### Point " << trajectory_points.size() << " #########################" << endl;
+                    //判断模式对应输入(相对位置/绝对位置)
+                    if (!switch_trajectory_mode)
+                    {
+                        cout << "\n" << "X Position [m]: ";
+                        cin >> trajectory_point[0];
+                        cout << "\n" << "Y Position [m]: ";
+                        cin >> trajectory_point[1];
+                        cout << "\n" << "Z Position [m]: ";
+                        cin >> trajectory_point[2];
+                    }
+                    else
+                    {
+                        cout << "\n" << "X Relative Position [m]: ";
+                        cin >> trajectory_point[0];
+                        cout << "\n" << "Y Relative Position [m]: ";
+                        cin >> trajectory_point[1];
+                        cout << "\n" << "Z Relative Position [m]: ";
+                        cin >> trajectory_point[2];
+                    }
+                    //偏航角指令
+                    cout << "\n" << "Yaw Command [deg]: ";
+                    cin >> trajectory_point[3];
+                    //航点等待时间
+                    cout << "\n" << "Wait Time [s,int]: ";
+                    cin >> trajectory_point[4];
+                    trajectory_point[4] = (int) abs(trajectory_point[4]);
+
+                    //存入总向量
+                    trajectory_points.push_back(trajectory_point);
+
+                    //用户输入是否继续增加航点
+                    cout << "\n\n" << "Add Next Point? (0 -> exit, else -> continue): ";
+                    cin >> next_point;
+                    if (next_point == '0')
+                    {
+                        break;
+                    }
+                }
+                // 删除初始化的第一个点
+                trajectory_points.erase(trajectory_points.begin());
+                print_head("PX4 Trajectory Center");
+                //打印模式
+                cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
+                //打印已输入航点
+                cout << WHITE << "Current Points:\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
+                for (int i = 1; i < trajectory_points.size(); i++)
+                {
+                    cout << WHITE << "\n\t\t " << i;
+                    for (int j = 0; j < trajectory_point.size(); j++)
+                    {
+                        cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
+                    }
+                }
+                //用户确认航点
+                cout << "\n"
+                     << WHITE << "Confirm to Execute? (0 -> exit, else -> continue): ";
+                cin >> confirm_trajectory;
+                if (next_point == '0')
+                {
+                    break;
+                }
+
+                //开始执行
+                print_head("PX4 Trajectory Center");
+                //打印模式
+                cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
+                //打印已输入航点
+                cout << WHITE << "Current Points:\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
+                for (int i = 1; i < trajectory_points.size(); i++)
+                {
+                    cout << WHITE << "\n\t\t " << i;
+                    for (int j = 0; j < trajectory_point.size(); j++)
+                    {
+                        cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
+                    }
+                }
+                Info("Trajectory Mode is Running...");
+                cmd.Move_frame = px4_cmd::Command::ENU;
+                cmd.Move_mode = px4_cmd::Command::XYZ_POS;
+                for (int i = 0; i < trajectory_points.size(); i++)
+                {
+                    Info("Flying to Point " + to_string(i+1));
+                    if (!switch_trajectory_mode)
+                    {
+                        cmd.desire_cmd[0] = trajectory_points[i][0];
+                        cmd.desire_cmd[1] = trajectory_points[i][1];
+                        cmd.desire_cmd[2] = trajectory_points[i][2];
+                    }
+                    else
+                    {
+                        cmd.desire_cmd[0] = trajectory_points[i][0] + current_state.pose.position.x;
+                        cmd.desire_cmd[1] = trajectory_points[i][1] + current_state.pose.position.y;
+                        cmd.desire_cmd[2] = trajectory_points[i][2] + current_state.pose.position.z;
+                    }
+                    cmd.yaw_cmd = trajectory_points[i][3];
+                    // 判断误差，误差小则认为到达航点附近
+                    err_x = 1;
+                    err_y = 1;
+                    err_z = 1;
+                    while (err_x > 0.1 || err_y > 0.1 || err_z > 0.1)
+                    {
+                        ros::spinOnce();
+                        err_x = abs(current_state.pose.position.x - cmd.desire_cmd[0]);
+                        err_y = abs(current_state.pose.position.y - cmd.desire_cmd[1]);
+                        err_z = abs(current_state.pose.position.z - cmd.desire_cmd[2]);
+                        sleep(1);
+                    }
+                    Info("Arrive at Point " + to_string(i + 1) + ", Wait " + to_string((int)trajectory_points[i][4]) + " s");
+                    // 等待规定时间
+                    sleep((int)trajectory_points[i][4]);
                 }
             }
         }
