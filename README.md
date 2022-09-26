@@ -15,10 +15,14 @@ You can set desire height for takeoff.
 
 ### Move
 
+<div style="align: center">
+
 | Frame | SubCommand |
 | :---: | ----------- |
 |   ENU    | Position (XYZ) [m]<br>Velocity (XY) [m/s] + Height (Z) [m]<br>Velocity (XYZ) [m/s]<br>Relative Position (XYZ) [m] |
 |   Body   | Velocity (XYZ) [m/s] |
+
+</div>
 
 And support `yaw command [deg]` input for both frames.
 
@@ -26,15 +30,15 @@ And support `yaw command [deg]` input for both frames.
 ## Support Mode
 ```c++
 "Refresh Status"  //刷新状态
-​"MANUAL"          //手动
-​"OFFBOARD"        //外部控制
-​"STABILIZED"      //自稳
-​"POSCTL"          //位置控制
-​"ALTCTL"          //高度控制
-​"AUTO.LAND"       //自动降落
-​"AUTO.RTL"        //自动返航
-​"Arm"             //解除锁定
-​"DisArm"          //锁定
+"MANUAL"          //手动
+"OFFBOARD"        //外部控制
+"STABILIZED"      //自稳
+"POSCTL"          //位置控制
+"ALTCTL"          //高度控制
+"AUTO.LAND"       //自动降落
+"AUTO.RTL"        //自动返航
+"Arm"             //解除锁定
+"DisArm"          //锁定
 ```
 
 ## Todo
