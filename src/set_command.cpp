@@ -58,6 +58,7 @@ std::vector<string> trajectory_list = {
 // 子函数声明
 void print_current_cmd(px4_cmd::Command cmd, float cmd_value[3]);
 void pub_thread_fun();
+void print_trajectory_info(int mode, vector<float> point, std::vector<vector<float>> points, int start);
 
 /*     主函数      */
 int main(int argc, char **argv)
@@ -321,7 +322,7 @@ int main(int argc, char **argv)
                 // 输入模式：相对位置/绝对位置
                 system("clear");
                 print_title("PX4 Trajectory Center", trajectory_list);
-                cout << WHITE << "Tip: Trajectory Only Support Frame [" << GREEN << "ENU" << WHITE << "]" << endl;
+                cout << YELLOW << "Tip: Trajectory Only Support Frame [" << GREEN << "ENU" << YELLOW << "]" << endl;
                 cout << WHITE << "\n" << "Input Trajectory Mode Number: ";
                 cin >> switch_trajectory_mode;
                 // 判断输入正确性
@@ -338,18 +339,7 @@ int main(int argc, char **argv)
                     //清空并显示轨迹航点输入模式
                     system("clear");
                     print_head("PX4 Trajectory Center");
-                    //打印模式
-                    cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
-                    //打印已输入航点
-                    cout << WHITE << "Current Points:\t ID\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
-                    for (int i = 1; i < trajectory_points.size(); i++)
-                    {
-                        cout << WHITE << "\n\t\t " << i;
-                        for (int j = 0; j < trajectory_point.size(); j++)
-                        {
-                            cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
-                        }
-                    }
+                    print_trajectory_info(switch_trajectory_mode, trajectory_point, trajectory_points, 1);
                     cout << "\n\n"
                          << "######################### Point " << trajectory_points.size() << " #########################" << endl;
                     //判断模式对应输入(相对位置/绝对位置)
@@ -392,42 +382,25 @@ int main(int argc, char **argv)
                 }
                 // 删除初始化的第一个点
                 trajectory_points.erase(trajectory_points.begin());
+
+                //输出标题
+                system("clear");
                 print_head("PX4 Trajectory Center");
-                //打印模式
-                cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
-                //打印已输入航点
-                cout << WHITE << "Current Points:\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
-                for (int i = 1; i < trajectory_points.size(); i++)
-                {
-                    cout << WHITE << "\n\t\t " << i;
-                    for (int j = 0; j < trajectory_point.size(); j++)
-                    {
-                        cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
-                    }
-                }
+                print_trajectory_info(switch_trajectory_mode, trajectory_point, trajectory_points, 0);
                 //用户确认航点
-                cout << "\n"
+                cout << "\n\n"
                      << WHITE << "Confirm to Execute? (0 -> exit, else -> continue): ";
                 cin >> confirm_trajectory;
-                if (next_point == '0')
+                if (confirm_trajectory == '0')
                 {
                     break;
                 }
 
                 //开始执行
+                system("clear");
                 print_head("PX4 Trajectory Center");
-                //打印模式
-                cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[switch_trajectory_mode] << WHITE << "]" << endl;
-                //打印已输入航点
-                cout << WHITE << "Current Points:\t X [m]\t Y [m] \t Z[m] \t Yaw [deg] \t Time [s]";
-                for (int i = 1; i < trajectory_points.size(); i++)
-                {
-                    cout << WHITE << "\n\t\t " << i;
-                    for (int j = 0; j < trajectory_point.size(); j++)
-                    {
-                        cout << WHITE << "\t " << setprecision(2) << fixed << trajectory_points[i][j];
-                    }
-                }
+                print_trajectory_info(switch_trajectory_mode, trajectory_point, trajectory_points, 0);
+                cout << "\n" << endl;
                 Info("Trajectory Mode is Running...");
                 cmd.Move_frame = px4_cmd::Command::ENU;
                 cmd.Move_mode = px4_cmd::Command::XYZ_POS;
@@ -463,6 +436,9 @@ int main(int argc, char **argv)
                     // 等待规定时间
                     sleep((int)trajectory_points[i][4]);
                 }
+                Info("Trajectory Executed Done, Automatically changed to Hover Command!");
+                cmd.Mode = px4_cmd::Command::Hover;
+                sleep(2);
             }
         }
     }
@@ -496,4 +472,23 @@ void pub_thread_fun()
 void state_cb(const geometry_msgs::PoseStamped::ConstPtr &msg)
 {
     current_state = *msg;
+}
+
+// 轨迹标题输出
+void print_trajectory_info(int mode, vector<float>  point, std::vector<vector<float>> points, int start)
+{
+    //打印模式
+    cout << WHITE << "Trajectory Mode: [" << GREEN << trajectory_list[mode] << WHITE << "]\n" << endl;
+    //打印已输入航点
+    cout << WHITE << "--------------------- Current Points ----------------------\n"
+         << "ID\t X [m]\t Y [m] \t Z [m] \t Yaw [deg] \t Wait [s]";
+    for (int i = start; i < points.size(); i++)
+    {
+        cout << WHITE << "\n" << (start == 0 ? i + 1 : i);
+        for (int j = 0; j < (point.size() - 1); j++)
+        {
+            cout << WHITE << "\t " << setprecision(2) << fixed << points[i][j];
+        }
+        cout << WHITE << "\t\t " << setprecision(2) << fixed << points[i][point.size()-1];
+    }
 }
